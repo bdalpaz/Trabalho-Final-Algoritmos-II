@@ -1,5 +1,2 @@
-PS C:\Users\alice\OneDrive\Área de Trabalho\trabalho\trab> java -cp ".;lib/postgresql-42.7.4.jar" PostgresConnection
->>
-Conexão!
-Conexão estabelecida com sucesso!
-PS C:\Users\alice\OneDrive\Área de Trabalho\trabalho\trab> javac -cp lib/postgresql-42.7.4.jar PostgresConnection.java
+java -cp ".;lib/postgresql-42.7.4.jar" PostgresConnection
+javac -cp lib/postgresql-42.7.4.jar PostgresConnection.java
