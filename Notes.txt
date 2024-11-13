@@ -1,2 +1,7 @@
 java -cp ".;lib/postgresql-42.7.4.jar" PostgresConnection
-javac -cp lib/postgresql-42.7.4.jar PostgresConnection.java
+-> Para executar um programa Java que usa a
+ biblioteca JDBC do PostgreSQL para se conectar ao banco de dados. 
+
+
+javac -cp lib/postgresql-42.7.4.jar PostgresConnection.java 
+-> Para compilar o código fonte do arquivo Java
