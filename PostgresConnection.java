@@ -3,6 +3,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+
 
 public class PostgresConnection {
 
@@ -10,12 +12,18 @@ public class PostgresConnection {
     private static final String USER = "postgres";
     private static final String PASSWORD = "postgres";
 
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASSWORD);
+    }
+
     public static void main(String[] args) {
       System.out.println("Conexão!");
 
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
+        Statement stmt = null;
+
 
         try {
             // Opcional: Carregar o driver explicitamente
