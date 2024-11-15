@@ -20,7 +20,7 @@ public class Cliente {
       this.cidade = cidade;
     }
 
-    public void SalvarNoBanco() throws SQLException {
+    public void SalvarClienteNoBanco() throws SQLException {
         String sql = "INSERT INTO cliente (id, nome, cpf, cidade) VALUES (?, ?, ?, ?)"; //Esses pontos de interrogação correspondem a resposta do usuário 
 
         try (Connection conn = PostgresConnection.getConnection();
