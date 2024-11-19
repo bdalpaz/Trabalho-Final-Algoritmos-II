@@ -19,17 +19,34 @@ public class Cliente {
       this.cidade = cidade;
     }
 
-    public boolean ValidaDadosDoCliente() { // pra conferir antes de ir pro banco
+    public boolean ValidaDadosDoCliente() throws SQLException { // Adicione throws SQLException
       if (nome == null || nome.trim().isEmpty()) {
-          System.err.println("Nome não pode estar vazio");
+          System.out.println("Nome não pode estar vazio");
           return false;
       }
       if (cpf == null || cpf.length() != 11) {
-          System.err.println("CPF inválido!");
+          System.out.println("CPF inválido!");
+          return false;
+      }
+      if (!cidadeExisteNoBanco(this.cidade)) { // Agora não gerará erro
+          System.out.println("Cidade informada não existe no banco de dados!");
           return false;
       }
       return true;
-  }  
+  }
+  
+public static boolean cidadeExisteNoBanco(String cidade) throws SQLException {
+  String sql = "SELECT COUNT(*) FROM cidade WHERE cidadeibge = ?";
+  try (Connection conn = PostgresConnection.getConnection();
+       PreparedStatement stmt = conn.prepareStatement(sql)) {
+      stmt.setString(1, cidade);
+      ResultSet rs = stmt.executeQuery();
+      if (rs.next()) {
+          return rs.getInt(1) > 0; // da true se encontrar a cidade
+      }
+  }
+  return false;
+}
 
     public void SalvarClienteNoBanco() throws SQLException {
       if (!ValidaDadosDoCliente()) {
