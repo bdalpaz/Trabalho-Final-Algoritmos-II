@@ -6,3 +6,8 @@ para executar
 java -cp ".;postgresql-42.7.4.jar" Motorista
 
 só trocar as classes na hora
+
+
+O que ainda precisa ser feito:
+
+Implementar as funções no final da classe Main!
