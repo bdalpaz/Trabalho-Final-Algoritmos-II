@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class Motorista {
 
@@ -16,6 +15,7 @@ public class Motorista {
     private final String cnh;
     private final String cidade;
 
+    
     public Motorista(int id, String nome, String cpf, String cnh, String cidade) {
         this.id = id;
         this.nome = nome;
@@ -43,7 +43,7 @@ public class Motorista {
                 return false;
             }
         } catch (SQLException e) {
-            System.out.println("Erro ao verificar cidade no banco de dados: " + e.getMessage());
+            System.out.println("Erro ao verificar cidade no banco de dados!");
             return false;
         }
         return true;
@@ -54,7 +54,7 @@ public class Motorista {
             System.out.println("Cidade inválida: valor nulo ou vazio.");
             return false;
         }
-    
+
         String sql = "SELECT COUNT(*) FROM cidade WHERE cidadeibge = ?";
         try (Connection conn = PostgresConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -63,7 +63,7 @@ public class Motorista {
             return rs.next() && rs.getInt(1) > 0;
         }
     }
-    
+
     public void salvarMotoristaNoBanco() throws SQLException {
         if (!validaDadosDoMotorista()) return;
 
@@ -151,103 +151,23 @@ public class Motorista {
         }
     }
 
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        boolean continuar = true;
-
-        while (continuar) {
-            System.out.println("\n=== Motoristas ===");
-            System.out.println("1. Cadastrar Motorista");
-            System.out.println("2. Listar Motoristas");
-            System.out.println("3. Atualizar Motorista");
-            System.out.println("4. Excluir Motorista");
-            System.out.println("5. Sair");
-            System.out.print("Escolha uma opção: ");
-
-            int op = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (op) {
-                case 1 -> cadastrarMotorista(scanner);
-                case 2 -> listarMotoristasMenu();
-                case 3 -> atualizarMotorista(scanner);
-                case 4 -> excluirMotorista(scanner);
-                case 5 -> {
-                    continuar = false;
-                    System.out.println("Saindo do sistema...");
-                }
-                default -> System.out.println("Opção inválida! Tente novamente.");
-            }
-        }
+    public int getId() {
+        return id;
     }
 
-    private static void cadastrarMotorista(Scanner scanner) {
-        System.out.print("Nome: ");
-        String nome = scanner.nextLine();
-        System.out.print("CPF (11 dígitos): ");
-        String cpf = scanner.nextLine();
-        System.out.print("CNH: ");
-        String cnh = scanner.nextLine();
-        System.out.print("Cidade: ");
-        String cidade = scanner.nextLine();
-
-        Motorista motorista = new Motorista(nome, cpf, cnh, cidade);
-        try {
-            motorista.salvarMotoristaNoBanco();
-        } catch (SQLException e) {
-            System.err.println("Erro ao salvar motorista: " + e.getMessage());
-        }
+    public String getNome() {
+        return nome;
     }
 
-    private static void listarMotoristasMenu() {
-        try {
-            List<Motorista> motoristas = Motorista.listarMotoristas();
-            if (motoristas.isEmpty()) {
-                System.out.println("Nenhum motorista encontrado.");
-            } else {
-                System.out.println("\n=== Lista de Motoristas ===");
-                for (Motorista motorista : motoristas) {
-                    System.out.printf("ID: %d\nNome: %s\nCPF: %s\nCNH: %s\nCidade: %s\n",
-                            motorista.id, motorista.nome, motorista.cpf, motorista.cnh, motorista.cidade);
-                    System.out.println("--------------------------");
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao listar motoristas: " + e.getMessage());
-        }
+    public String getCpf() {
+        return cpf;
     }
 
-    private static void atualizarMotorista(Scanner scanner) {
-        System.out.print("Digite o ID do motorista a ser atualizado: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
-
-        System.out.print("Novo Nome: ");
-        String nome = scanner.nextLine();
-        System.out.print("Novo CPF (11 dígitos): ");
-        String cpf = scanner.nextLine();
-        System.out.print("Nova CNH: ");
-        String cnh = scanner.nextLine();
-        System.out.print("Nova Cidade: ");
-        String cidade = scanner.nextLine();
-
-        Motorista motorista = new Motorista(id, nome, cpf, cnh, cidade);
-        try {
-            motorista.atualizarMotoristaNoBanco();
-        } catch (SQLException e) {
-            System.err.println("Erro ao atualizar motorista: " + e.getMessage());
-        }
+    public String getCnh() {
+        return cnh;
     }
 
-    private static void excluirMotorista(Scanner scanner) {
-        System.out.print("Digite o ID do motorista a ser excluído: ");
-        int id = scanner.nextInt();
-
-        try {
-            Motorista motorista = new Motorista(id, null, null, null, null);
-            motorista.excluirMotoristaDoBanco();
-        } catch (SQLException e) {
-            System.err.println("Erro ao excluir motorista: " + e.getMessage());
-        }
+    public String getCidade() {
+        return cidade;
     }
 }
