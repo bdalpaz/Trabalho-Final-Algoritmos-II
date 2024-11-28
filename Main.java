@@ -114,7 +114,8 @@ public class Main {
                 List<Motorista> motoristas = Motorista.listarMotoristas();
                 for (Motorista motorista : motoristas) {
                     System.out.printf("ID: %d, Nome: %s, CPF: %s, CNH: %s, Cidade: %s%n",
-                            motorista.getId(), motorista.getNome(), motorista.getCpf(), motorista.getCnh(), motorista.getCidade());
+                            motorista.getId(), motorista.getNome(), motorista.getCpf(), motorista.getCnh(),
+                            motorista.getCidade());
                 }
             }
             case "Produto" -> {
@@ -129,9 +130,28 @@ public class Main {
     }
 
     private static void atualizarEntidade(Scanner scanner, String entidade) throws SQLException {
-        System.out.print("Digite o ID do " + entidade.toLowerCase() + " a ser atualizado: ");
-        int id = scanner.nextInt();
+        System.out.println("Deseja buscar por (1) ID ou (2) Nome?");
+        int escolha = scanner.nextInt();
         scanner.nextLine();
+
+        int id = -1;
+
+        if (escolha == 1) {
+            System.out.print("Digite o ID do " + entidade.toLowerCase() + " a ser atualizado: ");
+            id = scanner.nextInt();
+            scanner.nextLine();
+        } else if (escolha == 2) {
+            System.out.print("Digite o Nome do " + entidade.toLowerCase() + " a ser atualizado: ");
+            String nome = scanner.nextLine();
+            id = buscarIdPorNome(nome, entidade);
+            if (id == -1) {
+                System.out.println(entidade + " não encontrado(a) com o nome especificado.");
+                return;
+            }
+        } else {
+            System.out.println("Opção inválida!");
+            return;
+        }
 
         switch (entidade) {
             case "Cliente" -> {
@@ -170,8 +190,27 @@ public class Main {
     }
 
     private static void excluirEntidade(Scanner scanner, String entidade) throws SQLException {
-        System.out.print("Digite o ID do " + entidade.toLowerCase() + " a ser excluído: ");
-        int id = scanner.nextInt();
+        System.out.println("Deseja buscar por (1) ID ou (2) Nome?");
+        int escolha = scanner.nextInt();
+        scanner.nextLine();
+
+        int id = -1;
+
+        if (escolha == 1) {
+            System.out.print("Digite o ID do " + entidade.toLowerCase() + " a ser excluído: ");
+            id = scanner.nextInt();
+        } else if (escolha == 2) {
+            System.out.print("Digite o Nome do " + entidade.toLowerCase() + " a ser excluído: ");
+            String nome = scanner.nextLine();
+            id = buscarIdPorNome(nome, entidade);
+            if (id == -1) {
+                System.out.println(entidade + " não encontrado(a) com o nome especificado.");
+                return;
+            }
+        } else {
+            System.out.println("Opção inválida!");
+            return;
+        }
 
         switch (entidade) {
             case "Cliente" -> new Cliente(id, null, null, null).excluirClienteDoBanco();
@@ -179,6 +218,37 @@ public class Main {
             case "Produto" -> new Produto(id, null, 0).excluirProdutoDoBanco();
             default -> throw new IllegalArgumentException("Entidade inválida: " + entidade);
         }
+    }
+
+    private static int buscarIdPorNome(String nome, String entidade) throws SQLException {
+        switch (entidade) {
+            case "Cliente" -> {
+                List<Cliente> clientes = Cliente.listarClientes();
+                for (Cliente cliente : clientes) {
+                    if (cliente.getNome().equalsIgnoreCase(nome)) {
+                        return cliente.getId();
+                    }
+                }
+            }
+            case "Motorista" -> {
+                List<Motorista> motoristas = Motorista.listarMotoristas();
+                for (Motorista motorista : motoristas) {
+                    if (motorista.getNome().equalsIgnoreCase(nome)) {
+                        return motorista.getId();
+                    }
+                }
+            }
+            case "Produto" -> {
+                List<Produto> produtos = Produto.listarProdutos();
+                for (Produto produto : produtos) {
+                    if (produto.getNome().equalsIgnoreCase(nome)) {
+                        return produto.getId();
+                    }
+                }
+            }
+            default -> throw new IllegalArgumentException("Entidade inválida: " + entidade);
+        }
+        return -1;
     }
 
     private static void menuViagem(Scanner scanner) {
