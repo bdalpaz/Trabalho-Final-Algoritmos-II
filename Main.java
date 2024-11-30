@@ -221,11 +221,16 @@ public class Main {
     }
 
     private static int buscarIdPorNome(String nome, String entidade) throws SQLException {
+        if (nome == null || nome.isBlank()) {
+            System.out.println("Nome não pode ser vazio ou nulo.");
+            return -1;
+        }
+
         switch (entidade) {
             case "Cliente" -> {
                 List<Cliente> clientes = Cliente.listarClientes();
                 for (Cliente cliente : clientes) {
-                    if (cliente.getNome().equalsIgnoreCase(nome)) {
+                    if (cliente.getNome().equalsIgnoreCase(nome.trim())) {
                         return cliente.getId();
                     }
                 }
@@ -233,7 +238,7 @@ public class Main {
             case "Motorista" -> {
                 List<Motorista> motoristas = Motorista.listarMotoristas();
                 for (Motorista motorista : motoristas) {
-                    if (motorista.getNome().equalsIgnoreCase(nome)) {
+                    if (motorista.getNome().equalsIgnoreCase(nome.trim())) {
                         return motorista.getId();
                     }
                 }
@@ -241,13 +246,15 @@ public class Main {
             case "Produto" -> {
                 List<Produto> produtos = Produto.listarProdutos();
                 for (Produto produto : produtos) {
-                    if (produto.getNome().equalsIgnoreCase(nome)) {
+                    if (produto.getNome().equalsIgnoreCase(nome.trim())) {
                         return produto.getId();
                     }
                 }
             }
             default -> throw new IllegalArgumentException("Entidade inválida: " + entidade);
         }
+
+        System.out.println(entidade + " não encontrado(a) com o nome especificado.");
         return -1;
     }
 
