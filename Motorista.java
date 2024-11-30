@@ -28,12 +28,33 @@ public class Motorista {
         this(0, nome, cpf, cnh, cidade);
     }
 
+    public boolean validaCpfDoMotorista(){
+        if (cpf.length() != 11) return false;
+        if (cpf.matches("(\\d)\1{10}")) return false;
+        int soma = 0;
+        for (int i = 0; i < 9; i++) {
+            soma += Character.getNumericValue(cpf.charAt(i)) * (10 - i);
+        }
+        int primeiroDigitoVerificador = 11 - (soma % 11);
+        if (primeiroDigitoVerificador >= 10) primeiroDigitoVerificador = 0;
+
+        if (primeiroDigitoVerificador != Character.getNumericValue(cpf.charAt(9))) return false;
+        soma = 0;
+        for (int i = 0; i < 10; i++) {
+            soma += Character.getNumericValue(cpf.charAt(i)) * (11 - i);
+        }
+        int segundoDigitoVerificador = 11 - (soma % 11);
+        if (segundoDigitoVerificador >= 10) segundoDigitoVerificador = 0;
+
+        return segundoDigitoVerificador == Character.getNumericValue(cpf.charAt(10));
+    }
+    
     public boolean validaDadosDoMotorista() {
         if (nome == null || nome.trim().isEmpty()) {
             System.out.println("Nome não pode estar vazio.");
             return false;
         }
-        if (cpf == null || cpf.length() != 11) {
+        if (!validaCpfDoMotorista()) {
             System.out.println("CPF inválido!");
             return false;
         }
@@ -104,6 +125,17 @@ public class Motorista {
             }
         }
         return motoristas;
+    }
+
+    public static boolean motoristaTemViagemAndamento(int id) throws SQLException {
+        
+        String sql = "SELECT COUNT(*) FROM viagem WHERE motorista_id = ? and status = 'Iniciada'";
+        try (Connection conn = PostgresConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, id);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next() && rs.getInt(1) > 0;
+        }
     }
 
     public void atualizarMotoristaNoBanco() throws SQLException {

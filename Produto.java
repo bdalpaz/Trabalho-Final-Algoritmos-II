@@ -34,6 +34,17 @@ public class Produto {
         return true;
     }
 
+    // public static boolean produtoTemViagemAndamento(int id) throws SQLException {
+        
+    //     String sql = "SELECT COUNT(*) FROM viagem WHERE produto_id = ? and status = 'Iniciada'";
+    //     try (Connection conn = PostgresConnection.getConnection();
+    //          PreparedStatement stmt = conn.prepareStatement(sql)) {
+    //         stmt.setString(1, id);
+    //         ResultSet rs = stmt.executeQuery();
+    //         return rs.next() && rs.getInt(1) > 0;
+    //     }
+    // }
+    
     public void salvarProdutoNoBanco() throws SQLException {
         if (!validaDadosDoProduto()) return;
 

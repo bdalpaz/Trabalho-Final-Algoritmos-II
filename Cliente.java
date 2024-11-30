@@ -39,14 +39,35 @@ public class Cliente {
     public void setCidade(String cidade) { this.cidade = cidade; }
 
 
+    public boolean validaCpfDoCliente(){
+        if (cpf.length() != 11) return false;
+        if (cpf.matches("(\\d)\1{10}")) return false;
+        int soma = 0;
+        for (int i = 0; i < 9; i++) {
+            soma += Character.getNumericValue(cpf.charAt(i)) * (10 - i);
+        }
+        int primeiroDigitoVerificador = 11 - (soma % 11);
+        if (primeiroDigitoVerificador >= 10) primeiroDigitoVerificador = 0;
+
+        if (primeiroDigitoVerificador != Character.getNumericValue(cpf.charAt(9))) return false;
+        soma = 0;
+        for (int i = 0; i < 10; i++) {
+            soma += Character.getNumericValue(cpf.charAt(i)) * (11 - i);
+        }
+        int segundoDigitoVerificador = 11 - (soma % 11);
+        if (segundoDigitoVerificador >= 10) segundoDigitoVerificador = 0;
+
+        return segundoDigitoVerificador == Character.getNumericValue(cpf.charAt(10));
+    }
     public boolean validaDadosDoCliente() {
         if (nome == null || nome.trim().isEmpty()) {
             System.out.println("Nome não pode estar vazio.");
             return false;
         }
-        if (cpf == null || cpf.length() != 11) {
+        if (!validaCpfDoCliente()) {
             System.out.println("CPF inválido! Deve conter 11 dígitos.");
             return false;
+
         }
         try {
             if (!cidadeExisteNoBanco(this.cidade)) {
@@ -70,6 +91,17 @@ public class Cliente {
         try (Connection conn = PostgresConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, cidade.trim());
+            ResultSet rs = stmt.executeQuery();
+            return rs.next() && rs.getInt(1) > 0;
+        }
+    }
+
+    public static boolean clienteTemViagemAndamento(int id) throws SQLException {
+        
+        String sql = "SELECT COUNT(*) FROM viagem WHERE cliente_id = ? and status = 'Iniciada'";
+        try (Connection conn = PostgresConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
             return rs.next() && rs.getInt(1) > 0;
         }
@@ -165,3 +197,4 @@ public class Cliente {
         }
     }
 }
+

@@ -15,6 +15,7 @@ public class Viagem {
     private String status;
     private int motoristaId; // Relacionamento com Motorista
     private int clienteId; // Relacionamento com Cliente
+    // private int produtoId;
 
     public Viagem(int id, String descricao, String cidadeOrigem, String cidadeDestino, String status, int motoristaId, int clienteId) {
         this.id = id;
@@ -24,6 +25,7 @@ public class Viagem {
         this.status = status;
         this.motoristaId = motoristaId;
         this.clienteId = clienteId;
+        // this.produtoId = produtoId;
     }
 
     public Viagem(String descricao, String cidadeOrigem, String cidadeDestino, String status, int motoristaId, int clienteId) {
@@ -172,10 +174,14 @@ public class Viagem {
         return clienteId;
     }
 
+    // public int getProdutoId() {
+    //     return produtoId;
+    // }
+
     @Override
     public String toString() {
         return "Viagem [ID=" + id + ", Descrição=" + descricao + ", Cidade Origem=" + cidadeOrigem +
                ", Cidade Destino=" + cidadeDestino + ", Status=" + status + ", Motorista ID=" + motoristaId +
-               ", Cliente ID=" + clienteId + "]";
+               ", Cliente ID=" + clienteId + /* ", Produto Id=" + produtoId +  */"]";
     }
 }

@@ -213,10 +213,31 @@ public class Main {
         }
 
         switch (entidade) {
-            case "Cliente" -> new Cliente(id, null, null, null).excluirClienteDoBanco();
-            case "Motorista" -> new Motorista(id, null, null, null, null).excluirMotoristaDoBanco();
-            case "Produto" -> new Produto(id, null, 0).excluirProdutoDoBanco();
-            default -> throw new IllegalArgumentException("Entidade inválida: " + entidade);
+            case "Cliente" : 
+                boolean temCliente = new Cliente.clienteTemViagemAndamento(id);
+                if (temCliente){
+                    System.out.println("Este " + entidade + " não pode ser removido, pois ele está em uma viagem em andamento.");
+                    return;
+                }
+                new Cliente(id, null, null, null).excluirClienteDoBanco();
+                break;
+            case "Motorista" : 
+                boolean estaEmViagem = new Motorista.motoristaTemViagemAndamento(id);
+                if (estaEmViagem){
+                    System.out.println("Este " + entidade + " não pode ser removido, pois ele está em uma viagem em andamento.");
+                    return;
+                }
+                new Motorista(id, null, null, null, null).excluirMotoristaDoBanco();
+                break;
+            case "Produto" : 
+               // boolean produtoEstaEmViagem = new Produto.produtoTemViagemAndamento(id);
+                // if (produtoEstaEmViagem){
+                //     System.out.println("Este " + entidade + " não pode ser removido, pois ele está em uma viagem em andamento.");
+                //     return;
+                // }
+                new Produto(id, null, 0).excluirProdutoDoBanco();
+                break;
+            default : throw new IllegalArgumentException("Entidade inválida: " + entidade);
         }
     }
 
