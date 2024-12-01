@@ -21,77 +21,51 @@ public class Cliente {
         this.cidade = cidade;
     }
 
+
     public Cliente(String nome, String cpf, String cidade) {
         this(0, nome, cpf, cidade);
     }
 
-    // Teste pra ver se pega melhor as respostas
-    // não mexer
-    public int getId() {
-        return id;
-    }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+// Teste pra ver se pega melhor as respostas 
+//não mexer
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+    public String getCpf() { return cpf; }
+    public void setCpf(String cpf) { this.cpf = cpf; }
+    public String getCidade() { return cidade; }
+    public void setCidade(String cidade) { this.cidade = cidade; }
 
-    public String getNome() {
-        return nome;
-    }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getCpf() {
-        return cpf;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
-
-    public String getCidade() {
-        return cidade;
-    }
-
-    public void setCidade(String cidade) {
-        this.cidade = cidade;
-    }
-
-    public boolean validaCpfDoCliente() {
-        if (cpf.length() != 11)
-            return false;
-        if (cpf.matches("(\\d)\1{10}"))
-            return false;
+    public boolean validaCpfDoCliente(){
+        if (cpf.length() != 11) return false;
+        if (cpf.matches("(\\d)\1{10}")) return false;
         int soma = 0;
         for (int i = 0; i < 9; i++) {
             soma += Character.getNumericValue(cpf.charAt(i)) * (10 - i);
         }
         int primeiroDigitoVerificador = 11 - (soma % 11);
-        if (primeiroDigitoVerificador >= 10)
-            primeiroDigitoVerificador = 0;
+        if (primeiroDigitoVerificador >= 10) primeiroDigitoVerificador = 0;
 
-        if (primeiroDigitoVerificador != Character.getNumericValue(cpf.charAt(9)))
-            return false;
+        if (primeiroDigitoVerificador != Character.getNumericValue(cpf.charAt(9))) return false;
         soma = 0;
         for (int i = 0; i < 10; i++) {
             soma += Character.getNumericValue(cpf.charAt(i)) * (11 - i);
         }
         int segundoDigitoVerificador = 11 - (soma % 11);
-        if (segundoDigitoVerificador >= 10)
-            segundoDigitoVerificador = 0;
+        if (segundoDigitoVerificador >= 10) segundoDigitoVerificador = 0;
 
         return segundoDigitoVerificador == Character.getNumericValue(cpf.charAt(10));
     }
-
     public boolean validaDadosDoCliente() {
         if (nome == null || nome.trim().isEmpty()) {
             System.out.println("Nome não pode estar vazio.");
             return false;
         }
         if (!validaCpfDoCliente()) {
-            System.out.println("CPF inválido!.");
+            System.out.println("CPF inválido! Deve conter 11 dígitos.");
             return false;
 
         }
@@ -115,7 +89,7 @@ public class Cliente {
 
         String sql = "SELECT COUNT(*) FROM cidade WHERE cidadeibge = ?";
         try (Connection conn = PostgresConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, cidade.trim());
             ResultSet rs = stmt.executeQuery();
             return rs.next() && rs.getInt(1) > 0;
@@ -123,10 +97,10 @@ public class Cliente {
     }
 
     public static boolean clienteTemViagemAndamento(int id) throws SQLException {
-
+        
         String sql = "SELECT COUNT(*) FROM viagem WHERE cliente_id = ? and status = 'Iniciada'";
         try (Connection conn = PostgresConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
             return rs.next() && rs.getInt(1) > 0;
@@ -140,7 +114,7 @@ public class Cliente {
 
         String sql = "INSERT INTO cliente (nome, cpf, cidade) VALUES (?, ?, ?)";
         try (Connection conn = PostgresConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, nome);
             stmt.setString(2, cpf);
@@ -161,14 +135,15 @@ public class Cliente {
         String sql = "SELECT * FROM cliente";
         List<Cliente> clientes = new ArrayList<>();
         try (Connection conn = PostgresConnection.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 clientes.add(new Cliente(
                         rs.getInt("id"),
                         rs.getString("nome"),
                         rs.getString("cpf"),
-                        rs.getString("cidade")));
+                        rs.getString("cidade")
+                ));
             }
         }
         return clientes;
@@ -181,7 +156,7 @@ public class Cliente {
 
         String sql = "UPDATE cliente SET nome = ?, cpf = ?, cidade = ? WHERE id = ?";
         try (Connection conn = PostgresConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, this.nome);
             stmt.setString(2, this.cpf);
@@ -200,7 +175,7 @@ public class Cliente {
     public void excluirClienteDoBanco() throws SQLException {
         String sql = "DELETE FROM cliente WHERE id = ?";
         try (Connection conn = PostgresConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, this.id);
             int rowsDeleted = stmt.executeUpdate();
             if (rowsDeleted > 0) {
@@ -211,7 +186,7 @@ public class Cliente {
         }
     }
 
-    // Conexão com o banco
+    // Conexão com o banco 
     public static class PostgresConnection {
         private static final String URL = "jdbc:postgresql://localhost:5432/postgres";
         private static final String USER = "postgres";
@@ -222,3 +197,4 @@ public class Cliente {
         }
     }
 }
+
