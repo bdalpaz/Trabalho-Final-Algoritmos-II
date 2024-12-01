@@ -69,25 +69,37 @@ public class Main {
             case "Cliente" -> {
                 System.out.print("Nome: ");
                 String nome = scanner.nextLine();
-                System.out.print("CPF (11 dígitos): ");
+                System.out.print("CPF (apenas números): ");
                 String cpf = scanner.nextLine();
                 System.out.print("Cidade: ");
                 String cidade = scanner.nextLine();
+
                 Cliente cliente = new Cliente(nome, cpf, cidade);
-                cliente.salvarClienteNoBanco();
+                if (!cliente.validaCpfDoCliente()) {
+                    System.out.println("O cliente não foi salvo!");
+                } else {
+                    cliente.salvarClienteNoBanco();
+                }
             }
+
             case "Motorista" -> {
                 System.out.print("Nome: ");
                 String nome = scanner.nextLine();
-                System.out.print("CPF (11 dígitos): ");
+                System.out.print("CPF (apenas números): ");
                 String cpf = scanner.nextLine();
                 System.out.print("CNH: ");
                 String cnh = scanner.nextLine();
                 System.out.print("Cidade: ");
                 String cidade = scanner.nextLine();
+
                 Motorista motorista = new Motorista(nome, cpf, cnh, cidade);
-                motorista.salvarMotoristaNoBanco();
+                if (!motorista.validaDadosDoMotorista()) {
+                    System.out.println("O motorista não foi salvo");
+                } else {
+                    cliente.salvarMotoristaNoBanco();
+                }
             }
+
             case "Produto" -> {
                 System.out.print("Nome do Produto: ");
                 String nome = scanner.nextLine();
@@ -99,6 +111,7 @@ public class Main {
             }
             default -> throw new IllegalArgumentException("Entidade inválida: " + entidade);
         }
+
     }
 
     private static void listarEntidades(String entidade) throws SQLException {
