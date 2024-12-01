@@ -34,23 +34,23 @@ public class Produto {
         return true;
     }
 
-    // public static boolean produtoTemViagemAndamento(int id) throws SQLException {
-        
-    //     String sql = "SELECT COUNT(*) FROM viagem WHERE produto_id = ? and status = 'Iniciada'";
-    //     try (Connection conn = PostgresConnection.getConnection();
-    //          PreparedStatement stmt = conn.prepareStatement(sql)) {
-    //         stmt.setString(1, id);
-    //         ResultSet rs = stmt.executeQuery();
-    //         return rs.next() && rs.getInt(1) > 0;
-    //     }
-    // }
-    
+    public static boolean produtoTemViagemAndamento(int id) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM viagem WHERE produto_id = ? and status = 'Iniciada'";
+        try (Connection conn = PostgresConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next() && rs.getInt(1) > 0;
+        }
+    }
+
     public void salvarProdutoNoBanco() throws SQLException {
-        if (!validaDadosDoProduto()) return;
+        if (!validaDadosDoProduto())
+            return;
 
         String sql = "INSERT INTO produto (nome, quantidade) VALUES (?, ?)";
         try (Connection conn = PostgresConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, this.nome);
             stmt.setInt(2, this.quantidade);
@@ -70,25 +70,25 @@ public class Produto {
         String sql = "SELECT * FROM produto";
         List<Produto> produtos = new ArrayList<>();
         try (Connection conn = PostgresConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 produtos.add(new Produto(
                         rs.getInt("id"),
                         rs.getString("nome"),
-                        rs.getInt("quantidade")
-                ));
+                        rs.getInt("quantidade")));
             }
         }
         return produtos;
     }
 
     public void atualizarProdutoNoBanco() throws SQLException {
-        if (!validaDadosDoProduto()) return;
+        if (!validaDadosDoProduto())
+            return;
 
         String sql = "UPDATE produto SET nome = ?, quantidade = ? WHERE id = ?";
         try (Connection conn = PostgresConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, this.nome);
             stmt.setInt(2, this.quantidade);
@@ -106,7 +106,7 @@ public class Produto {
     public void excluirProdutoDoBanco() throws SQLException {
         String sql = "DELETE FROM produto WHERE id = ?";
         try (Connection conn = PostgresConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, this.id);
             int rowsDeleted = stmt.executeUpdate();
             if (rowsDeleted > 0) {
@@ -142,5 +142,36 @@ public class Produto {
     @Override
     public String toString() {
         return "Produto [ID=" + id + ", Nome=" + nome + ", Quantidade=" + quantidade + "]";
+    }
+
+    // Esse Main aqui foi criado porque alguns erros estavam ocorrendo pela ausência
+    // dele kkkk
+    // Ele serve só pra fazer um teste rápido
+    // Só ignorar
+    public static void main(String[] args) {
+        try {
+            Produto produto = new Produto("Exemplo", 10);
+
+            produto.salvarProdutoNoBanco();
+
+            System.out.println("Produtos cadastrados no banco:");
+            for (Produto p : listarProdutos()) {
+                System.out.println(p);
+            }
+
+            produto.quantidade = 20;
+            produto.atualizarProdutoNoBanco();
+
+            if (produtoTemViagemAndamento(produto.getId())) {
+                System.out.println("O produto possui viagens em andamento.");
+            } else {
+                System.out.println("O produto não possui viagens em andamento.");
+            }
+
+            produto.excluirProdutoDoBanco();
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao acessar o banco de dados: " + e.getMessage());
+        }
     }
 }

@@ -213,31 +213,35 @@ public class Main {
         }
 
         switch (entidade) {
-            case "Cliente" : 
+            case "Cliente":
                 boolean temCliente = new Cliente.clienteTemViagemAndamento(id);
-                if (temCliente){
-                    System.out.println("Este " + entidade + " não pode ser removido, pois ele está em uma viagem em andamento.");
+                if (temCliente) {
+                    System.out.println(
+                            "Este " + entidade + " não pode ser removido, pois ele está em uma viagem em andamento.");
                     return;
                 }
                 new Cliente(id, null, null, null).excluirClienteDoBanco();
                 break;
-            case "Motorista" : 
+            case "Motorista":
                 boolean estaEmViagem = new Motorista.motoristaTemViagemAndamento(id);
-                if (estaEmViagem){
-                    System.out.println("Este " + entidade + " não pode ser removido, pois ele está em uma viagem em andamento.");
+                if (estaEmViagem) {
+                    System.out.println(
+                            "Este " + entidade + " não pode ser removido, pois ele está em uma viagem em andamento.");
                     return;
                 }
                 new Motorista(id, null, null, null, null).excluirMotoristaDoBanco();
                 break;
-            case "Produto" : 
-               // boolean produtoEstaEmViagem = new Produto.produtoTemViagemAndamento(id);
+            case "Produto":
+                // boolean produtoEstaEmViagem = new Produto.produtoTemViagemAndamento(id);
                 // if (produtoEstaEmViagem){
-                //     System.out.println("Este " + entidade + " não pode ser removido, pois ele está em uma viagem em andamento.");
-                //     return;
+                // System.out.println("Este " + entidade + " não pode ser removido, pois ele
+                // está em uma viagem em andamento.");
+                // return;
                 // }
                 new Produto(id, null, 0).excluirProdutoDoBanco();
                 break;
-            default : throw new IllegalArgumentException("Entidade inválida: " + entidade);
+            default:
+                throw new IllegalArgumentException("Entidade inválida: " + entidade);
         }
     }
 
