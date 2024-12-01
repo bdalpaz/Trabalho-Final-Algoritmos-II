@@ -28,7 +28,7 @@ public class Motorista {
         this(0, nome, cpf, cnh, cidade);
     }
 
-    public boolean validaCpfDoMotorista(){
+    public boolean validaCpfDoMotorista(String cpf){
         if (cpf.length() != 11) return false;
         if (cpf.matches("(\\d)\1{10}")) return false;
         int soma = 0;

@@ -39,7 +39,7 @@ public class Cliente {
     public void setCidade(String cidade) { this.cidade = cidade; }
 
 
-    public boolean validaCpfDoCliente(){
+    public boolean validaCpfDoCliente(String cpf){
         if (cpf.length() != 11) return false;
         if (cpf.matches("(\\d)\1{10}")) return false;
         int soma = 0;
@@ -64,11 +64,7 @@ public class Cliente {
             System.out.println("Nome não pode estar vazio.");
             return false;
         }
-        if (!validaCpfDoCliente()) {
-            System.out.println("CPF inválido! Deve conter 11 dígitos.");
-            return false;
 
-        }
         try {
             if (!cidadeExisteNoBanco(this.cidade)) {
                 System.out.println("Cidade informada não existe no banco de dados!");

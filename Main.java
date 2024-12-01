@@ -65,12 +65,19 @@ public class Main {
     }
 
     private static void cadastrarEntidade(Scanner scanner, String entidade) throws SQLException {
+        Cliente clienteCpf = new Cliente("","","");
+        Motorista motoristaCpf = new Motorista("","","","");
         switch (entidade) {
             case "Cliente" -> {
                 System.out.print("Nome: ");
                 String nome = scanner.nextLine();
                 System.out.print("CPF (11 dígitos): ");
                 String cpf = scanner.nextLine();
+                boolean validaCpf = clienteCpf.validaCpfDoCliente(cpf);
+                if(!validaCpf) {
+                    System.out.println("Cpf não é válido!");
+                    return;
+                }
                 System.out.print("Cidade: ");
                 String cidade = scanner.nextLine();
                 Cliente cliente = new Cliente(nome, cpf, cidade);
@@ -81,6 +88,11 @@ public class Main {
                 String nome = scanner.nextLine();
                 System.out.print("CPF (11 dígitos): ");
                 String cpf = scanner.nextLine();
+                boolean validaCpf = motoristaCpf.validaCpfDoMotorista(cpf);
+                if(!validaCpf) {
+                    System.out.println("Cpf não é válido!");
+                    return;
+                }
                 System.out.print("CNH: ");
                 String cnh = scanner.nextLine();
                 System.out.print("Cidade: ");
