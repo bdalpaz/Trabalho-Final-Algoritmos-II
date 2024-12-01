@@ -25,7 +25,7 @@ public class Viagem {
         this.status = status;
         this.motoristaId = motoristaId;
         this.clienteId = clienteId;
-        // this.produtoId = produtoId;
+        this.produtoId = produtoId;
     }
 
     public Viagem(String descricao, String cidadeOrigem, String cidadeDestino, String status, int motoristaId, int clienteId) {
@@ -174,9 +174,9 @@ public class Viagem {
         return clienteId;
     }
 
-    // public int getProdutoId() {
-    //     return produtoId;
-    // }
+    public int getProdutoId() {
+        return produtoId;
+    }
 
     @Override
     public String toString() {

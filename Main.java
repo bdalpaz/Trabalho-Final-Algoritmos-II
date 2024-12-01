@@ -232,12 +232,11 @@ public class Main {
                 new Motorista(id, null, null, null, null).excluirMotoristaDoBanco();
                 break;
             case "Produto":
-                // boolean produtoEstaEmViagem = new Produto.produtoTemViagemAndamento(id);
-                // if (produtoEstaEmViagem){
-                // System.out.println("Este " + entidade + " não pode ser removido, pois ele
-                // está em uma viagem em andamento.");
-                // return;
-                // }
+               boolean produtoEstaEmViagem = new Produto.produtoTemViagemAndamento(id);
+                if (produtoEstaEmViagem){
+                System.out.println("Este " + entidade + " não pode ser removido, pois ele está em uma viagem em andamento.");
+                return;
+                }
                 new Produto(id, null, 0).excluirProdutoDoBanco();
                 break;
             default:
