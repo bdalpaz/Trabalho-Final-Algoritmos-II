@@ -65,8 +65,8 @@ public class Main {
     }
 
     private static void cadastrarEntidade(Scanner scanner, String entidade) throws SQLException {
-        Cliente clienteCpf = new Cliente("","","");
-        Motorista motoristaCpf = new Motorista("","","","");
+        Cliente clienteCpf = new Cliente("", "", "");
+        Motorista motoristaCpf = new Motorista("", "", "", "");
         switch (entidade) {
             case "Cliente" -> {
                 System.out.print("Nome: ");
@@ -74,7 +74,7 @@ public class Main {
                 System.out.print("CPF (11 dígitos): ");
                 String cpf = scanner.nextLine();
                 boolean validaCpf = clienteCpf.validaCpfDoCliente(cpf);
-                if(!validaCpf) {
+                if (!validaCpf) {
                     System.out.println("Cpf não é válido!");
                     return;
                 }
@@ -89,7 +89,7 @@ public class Main {
                 System.out.print("CPF (11 dígitos): ");
                 String cpf = scanner.nextLine();
                 boolean validaCpf = motoristaCpf.validaCpfDoMotorista(cpf);
-                if(!validaCpf) {
+                if (!validaCpf) {
                     System.out.println("Cpf não é válido!");
                     return;
                 }
@@ -244,10 +244,10 @@ public class Main {
                 new Motorista(id, null, null, null, null).excluirMotoristaDoBanco();
                 break;
             case "Produto":
-               boolean produtoEstaEmViagem = new Produto.produtoTemViagemAndamento(id);
-                if (produtoEstaEmViagem){
-                System.out.println("Este " + entidade + " não pode ser removido, pois ele está em uma viagem em andamento.");
-                return;
+                boolean produtoEstaEmViagem = new Produto.produtoTemViagemAndamento(id);
+                if (produtoEstaEmViagem) {
+                    System.out.println("Este " + entidade + " não pode ser removido, pois ele está em uma viagem em andamento.");
+                    return;
                 }
                 new Produto(id, null, 0).excluirProdutoDoBanco();
                 break;
@@ -293,7 +293,64 @@ public class Main {
         System.out.println(entidade + " não encontrado(a) com o nome especificado.");
         return -1;
     }
+    private static void iniciarViagem (Scanner scanner) throws SQLException {
+        System.out.print("Descrição da viagem: ");
+        String descricao = scanner.nextLine();
 
+        System.out.print("Cidade de origem: ");
+        String cidadeOrigem = scanner.nextLine();
+
+        System.out.print("Cidade de destino: ");
+        String cidadeDestino = scanner.nextLine();
+
+        System.out.print("ID do Motorista: ");
+        int idMotorista = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.print("ID do Cliente: ");
+        int idCliente = scanner.nextInt();
+        scanner.nextLine();
+
+        Viagem viagem = new Viagem(descricao, cidadeOrigem, cidadeDestino, "Iniciada", idMotorista, idCliente);
+        viagem.salvarViagemNoBanco();
+        System.out.println("Viagem iniciada com sucesso!");
+    }
+    private static void finalizarViagem (Scanner scanner) throws SQLException {
+        System.out.print("ID da viagem a ser finalizada: ");
+        int idViagem = scanner.nextInt();
+        scanner.nextLine();
+
+        String sql = "SELECT * FROM viagem WHERE id = ?";
+        try (Connection conn = Viagem.PostgresConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idViagem);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Viagem viagem = new Viagem(
+                        rs.getInt("id"),
+                        rs.getString("descricao"),
+                        rs.getString("cidade_origem"),
+                        rs.getString("cidade_destino"),
+                        rs.getString("status"),
+                        rs.getInt("motorista_id"),
+                        rs.getInt("cliente_id")
+                );
+
+                if (!viagem.getStatus().equalsIgnoreCase("Iniciada")) {
+                    System.out.println("Viagem não está em andamento.");
+                    return;
+                }
+
+                viagem.setStatus("Finalizada");
+                viagem.atualizarViagemNoBanco();
+                System.out.println("Viagem finalizada com sucesso!");
+            } else {
+                System.out.println("Viagem não encontrada.");
+            }
+        }
+    }
     private static void menuViagem(Scanner scanner) {
         boolean continuar = true;
 
@@ -304,27 +361,30 @@ public class Main {
             System.out.println("3. Voltar");
             System.out.print("Escolha uma opção: ");
 
-            int opcao = scanner.nextInt();
-            scanner.nextLine();
-
             try {
+                int opcao = scanner.nextInt();
+
                 switch (opcao) {
-                    case 1 -> iniciarViagem(scanner);
-                    case 2 -> finalizarViagem(scanner);
+                    case 1 -> {
+                        System.out.println("Iniciando nova viagem...");
+                        iniciarViagem(scanner);
+                    }
+                    case 2 -> {
+                        System.out.println("Finalizando viagem...");
+                        finalizarViagem(scanner);
+                    }
                     case 3 -> continuar = false;
                     default -> System.out.println("Opção inválida! Tente novamente.");
                 }
             } catch (SQLException e) {
                 System.err.println("Erro ao processar viagem: " + e.getMessage());
+                e.printStackTrace(); // Adicionado para identificar problemas de SQL.
+            } catch (Exception e) {
+                System.err.println("Erro inesperado: " + e.getMessage());
+                e.printStackTrace();
+                scanner.nextLine(); // Limpar entrada inválida.
             }
         }
     }
-
-    private static void iniciarViagem(Scanner scanner) throws SQLException {
-        // Implementar
-    }
-
-    private static void finalizarViagem(Scanner scanner) throws SQLException {
-        // Implementar
-    }
 }
+
