@@ -21,14 +21,12 @@ public class Cliente {
         this.cidade = cidade;
     }
 
-
     public Cliente(String nome, String cpf, String cidade) {
         this(0, nome, cpf, cidade);
     }
 
-
-// Teste pra ver se pega melhor as respostas 
-//não mexer
+    // Teste pra ver se pega melhor as respostas 
+    //não mexer
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public String getNome() { return nome; }
@@ -38,10 +36,9 @@ public class Cliente {
     public String getCidade() { return cidade; }
     public void setCidade(String cidade) { this.cidade = cidade; }
 
-
-    public boolean validaCpfDoCliente(String cpf){
+    public boolean validaCpfDoCliente(String cpf) {
         if (cpf.length() != 11) return false;
-        if (cpf.matches("(\\d)\1{10}")) return false;
+        if (cpf.matches("(\\d)\\1{10}")) return false;
         int soma = 0;
         for (int i = 0; i < 9; i++) {
             soma += Character.getNumericValue(cpf.charAt(i)) * (10 - i);
@@ -59,45 +56,43 @@ public class Cliente {
 
         return segundoDigitoVerificador == Character.getNumericValue(cpf.charAt(10));
     }
+
     public boolean validaDadosDoCliente() {
         if (nome == null || nome.trim().isEmpty()) {
             System.out.println("Nome não pode estar vazio.");
             return false;
         }
-
-        try {
-            if (!cidadeExisteNoBanco(this.cidade)) {
-                System.out.println("Cidade informada não existe no banco de dados!");
-                return false;
-            }
-        } catch (SQLException e) {
-            System.out.println("Erro ao verificar cidade no banco de dados: " + e.getMessage());
+        if (!validaCpfDoCliente(cpf)) {
+            System.out.println("CPF inválido!");
             return false;
         }
         return true;
     }
-
+    
+    
     public static boolean cidadeExisteNoBanco(String cidade) throws SQLException {
         if (cidade == null || cidade.trim().isEmpty()) {
             System.out.println("Cidade inválida: valor nulo ou vazio.");
             return false;
         }
 
-        String sql = "SELECT COUNT(*) FROM cidade WHERE cidadeibge = ?";
+        String sql = "INSERT INTO cidade (cidade) VALUES (?)";
         try (Connection conn = PostgresConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, cidade.trim());
-            ResultSet rs = stmt.executeQuery();
-            return rs.next() && rs.getInt(1) > 0;
+            stmt.executeUpdate();
+            return true; // Inserção bem-sucedida
+        } catch (SQLException e) {
+            System.out.println("Erro ao inserir cidade: " + e.getMessage());
+            return false;
         }
     }
 
     public static boolean clienteTemViagemAndamento(int id) throws SQLException {
-        
         String sql = "SELECT COUNT(*) FROM viagem WHERE cliente_id = ? and status = 'Iniciada'";
         try (Connection conn = PostgresConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, String.valueOf(id));
+            stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             return rs.next() && rs.getInt(1) > 0;
         }
@@ -107,15 +102,15 @@ public class Cliente {
         if (!validaDadosDoCliente()) {
             return; // Não salva se os dados forem inválidos
         }
-
+    
         String sql = "INSERT INTO cliente (nome, cpf, cidade) VALUES (?, ?, ?)";
         try (Connection conn = PostgresConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
+    
             stmt.setString(1, nome);
             stmt.setString(2, cpf);
             stmt.setString(3, cidade);
-
+    
             int rowsInserted = stmt.executeUpdate();
             if (rowsInserted > 0) {
                 ResultSet generatedKeys = stmt.getGeneratedKeys();
@@ -123,9 +118,12 @@ public class Cliente {
                     this.id = generatedKeys.getInt(1);
                     System.out.println("Cliente salvo com sucesso! ID: " + this.id);
                 }
+            } else {
+                System.out.println("Falha ao salvar o cliente.");
             }
         }
     }
+    
 
     public static List<Cliente> listarClientes() throws SQLException {
         String sql = "SELECT * FROM cliente";
@@ -192,5 +190,34 @@ public class Cliente {
             return DriverManager.getConnection(URL, USER, PASSWORD);
         }
     }
+
+
+    public static void main(String[] args) {
+        try {
+            Cliente cliente = new Cliente  (
+            "Teste de funcionalidade",  
+            "66226385006", //gerador de cpf online
+            "São Paulo"
+        );
+
+
+            if (cliente.validaDadosDoCliente()) {
+                cliente.salvarClienteNoBanco();
+            }
+
+            List<Cliente> clientes = Cliente.listarClientes();
+            for (Cliente c : clientes) {
+                System.out.println("ID: " + c.getId() + ", Nome: " + c.getNome() + ", CPF: " + c.getCpf() + ", Cidade: " + c.getCidade());
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao executar operações no banco: " + e.getMessage());
+        }
+    }
 }
+
+
+
+
+
+
 

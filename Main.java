@@ -1,17 +1,31 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+
 
 
 public class Main {
 
+
+       // Conexão com o banco 
+    public static class PostgresConnection {
+        private static final String URL = "jdbc:postgresql://localhost:5432/postgres";
+        private static final String USER = "postgres";
+        private static final String PASSWORD = "postgres";
+
+        public static Connection getConnection() throws SQLException {
+            return DriverManager.getConnection(URL, USER, PASSWORD);
+        }
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         boolean continuar = true;
-
+    
         while (continuar) {
             System.out.println("\n=== Sistema de Gerenciamento ===");
             System.out.println("1. Gerenciar Clientes");
@@ -20,23 +34,29 @@ public class Main {
             System.out.println("4. Gerenciar Viagens");
             System.out.println("5. Sair");
             System.out.print("Escolha uma opção: ");
-
-            int op = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (op) {
-                case 1 -> menuEntidade(scanner, "Cliente");
-                case 2 -> menuEntidade(scanner, "Motorista");
-                case 3 -> menuEntidade(scanner, "Produto");
-                case 4 -> menuViagem(scanner);
-                case 5 -> {
-                    continuar = false;
-                    System.out.println("Saindo do sistema...");
+    
+            try {
+                String input = scanner.nextLine();
+                int op = Integer.parseInt(input);
+    
+                switch (op) {
+                    case 1 -> menuEntidade(scanner, "Cliente");
+                    case 2 -> menuEntidade(scanner, "Motorista");
+                    case 3 -> menuEntidade(scanner, "Produto");
+                    case 4 -> menuViagem(scanner);
+                    case 5 -> {
+                        continuar = false;
+                        System.out.println("Saindo do sistema...");
+                    }
+                    default -> System.out.println("Opção inválida! Tente novamente.");
                 }
-                default -> System.out.println("Opção inválida! Tente novamente.");
+            } catch (NumberFormatException e) {
+                System.out.println("Entrada inválida. Por favor, digite um número.");
             }
         }
     }
+
+
 
     private static void menuEntidade(Scanner scanner, String entidade) {
         boolean continuar = true;
@@ -67,6 +87,7 @@ public class Main {
             }
         }
     }
+
 
     private static void cadastrarEntidade(Scanner scanner, String entidade) throws SQLException {
         Cliente clienteCpf = new Cliente("", "", "");
@@ -392,4 +413,5 @@ public class Main {
         }
     }
 }
+
 

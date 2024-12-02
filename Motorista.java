@@ -15,7 +15,6 @@ public class Motorista {
     private final String cnh;
     private final String cidade;
 
-    
     public Motorista(int id, String nome, String cpf, String cnh, String cidade) {
         this.id = id;
         this.nome = nome;
@@ -28,9 +27,10 @@ public class Motorista {
         this(0, nome, cpf, cnh, cidade);
     }
 
-    public boolean validaCpfDoMotorista(String cpf){
+    public boolean validaCpfDoMotorista(String cpf) {
         if (cpf.length() != 11) return false;
-        if (cpf.matches("(\\d)\1{10}")) return false;
+        if (cpf.matches("(\\d)\\1{10}")) return false; // Verifica dígitos repetidos
+
         int soma = 0;
         for (int i = 0; i < 9; i++) {
             soma += Character.getNumericValue(cpf.charAt(i)) * (10 - i);
@@ -39,6 +39,7 @@ public class Motorista {
         if (primeiroDigitoVerificador >= 10) primeiroDigitoVerificador = 0;
 
         if (primeiroDigitoVerificador != Character.getNumericValue(cpf.charAt(9))) return false;
+
         soma = 0;
         for (int i = 0; i < 10; i++) {
             soma += Character.getNumericValue(cpf.charAt(i)) * (11 - i);
@@ -48,40 +49,31 @@ public class Motorista {
 
         return segundoDigitoVerificador == Character.getNumericValue(cpf.charAt(10));
     }
-    
+
     public boolean validaDadosDoMotorista(String cpf) {
-        if (nome == null || nome.trim().isEmpty()) {
-            System.out.println("Nome não pode estar vazio.");
-            return false;
-        }
         if (!validaCpfDoMotorista(cpf)) {
             System.out.println("CPF inválido!");
             return false;
         }
-        try {
-            if (!cidadeExisteNoBanco(this.cidade)) {
-                System.out.println("Cidade informada não existe no banco de dados!");
-                return false;
-            }
-        } catch (SQLException e) {
-            System.out.println("Erro ao verificar cidade no banco de dados!");
+        if (nome == null || nome.trim().isEmpty()) {
+            System.out.println("Nome não pode estar vazio.");
             return false;
         }
         return true;
     }
-
+    
     public static boolean cidadeExisteNoBanco(String cidade) throws SQLException {
         if (cidade == null || cidade.trim().isEmpty()) {
             System.out.println("Cidade inválida: valor nulo ou vazio.");
             return false;
         }
-
-        String sql = "SELECT COUNT(*) FROM cidade WHERE cidadeibge = ?";
+        String sql = "INSERT INTO cidade (cidade) VALUES (?)";
         try (Connection conn = PostgresConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, cidade.trim());
-            ResultSet rs = stmt.executeQuery();
-            return rs.next() && rs.getInt(1) > 0;
+            stmt.executeUpdate();
+            System.out.println("Cidade inserida no banco com sucesso!");
+            return true;
         }
     }
 
@@ -128,11 +120,10 @@ public class Motorista {
     }
 
     public static boolean motoristaTemViagemAndamento(int id) throws SQLException {
-        
-        String sql = "SELECT COUNT(*) FROM viagem WHERE motorista_id = ? and status = 'Iniciada'";
+        String sql = "SELECT COUNT(*) FROM viagem WHERE motorista_id = ? AND status = 'Iniciada'";
         try (Connection conn = PostgresConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, String.valueOf(id));
+            stmt.setInt(1, id); // Corrigido para setInt
             ResultSet rs = stmt.executeQuery();
             return rs.next() && rs.getInt(1) > 0;
         }
@@ -201,5 +192,31 @@ public class Motorista {
 
     public String getCidade() {
         return cidade;
+    }
+
+
+    public static void main(String[] args) {
+        try {
+            // Teste
+            Motorista motorista = new Motorista(
+                "Teste de funcionalidade",
+                "86087638008",  //gerador de cpf online
+                "CNH12345",
+                "São Paulo"
+            );
+
+            motorista.salvarMotoristaNoBanco();
+
+            List<Motorista> motoristas = listarMotoristas();
+            for (Motorista m : motoristas) {
+                System.out.println("ID: " + m.getId() +
+                                   ", Nome: " + m.getNome() +
+                                   ", CPF: " + m.getCpf() +
+                                   ", CNH: " + m.getCnh() +
+                                   ", Cidade: " + m.getCidade());
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro de banco de dados: " + e.getMessage());
+        }
     }
 }
