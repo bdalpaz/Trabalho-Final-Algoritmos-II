@@ -363,7 +363,8 @@ public class Main {
 
             try {
                 int opcao = scanner.nextInt();
-
+                scanner.nextLine();
+                // problema no switch case, não está puxando iniciarViagem e finalizarViagem
                 switch (opcao) {
                     case 1 -> {
                         System.out.println("Iniciando nova viagem...");
