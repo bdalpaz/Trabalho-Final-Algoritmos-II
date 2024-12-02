@@ -1,6 +1,10 @@
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 
 public class Main {
 
@@ -226,7 +230,7 @@ public class Main {
 
         switch (entidade) {
             case "Cliente":
-                boolean temCliente = new Cliente.clienteTemViagemAndamento(id);
+                boolean temCliente = Cliente.clienteTemViagemAndamento(id);
                 if (temCliente) {
                     System.out.println(
                             "Este " + entidade + " não pode ser removido, pois ele está em uma viagem em andamento.");
@@ -235,7 +239,7 @@ public class Main {
                 new Cliente(id, null, null, null).excluirClienteDoBanco();
                 break;
             case "Motorista":
-                boolean estaEmViagem = new Motorista.motoristaTemViagemAndamento(id);
+                boolean estaEmViagem = Motorista.motoristaTemViagemAndamento(id);
                 if (estaEmViagem) {
                     System.out.println(
                             "Este " + entidade + " não pode ser removido, pois ele está em uma viagem em andamento.");
@@ -244,7 +248,7 @@ public class Main {
                 new Motorista(id, null, null, null, null).excluirMotoristaDoBanco();
                 break;
             case "Produto":
-                boolean produtoEstaEmViagem = new Produto.produtoTemViagemAndamento(id);
+                boolean produtoEstaEmViagem = Produto.produtoTemViagemAndamento(id);
                 if (produtoEstaEmViagem) {
                     System.out.println("Este " + entidade + " não pode ser removido, pois ele está em uma viagem em andamento.");
                     return;
@@ -364,7 +368,7 @@ public class Main {
             try {
                 int opcao = scanner.nextInt();
                 scanner.nextLine();
-                // problema no switch case, não está puxando iniciarViagem e finalizarViagem
+                System.out.println(opcao);
                 switch (opcao) {
                     case 1 -> {
                         System.out.println("Iniciando nova viagem...");

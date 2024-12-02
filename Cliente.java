@@ -97,7 +97,7 @@ public class Cliente {
         String sql = "SELECT COUNT(*) FROM viagem WHERE cliente_id = ? and status = 'Iniciada'";
         try (Connection conn = PostgresConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, id);
+            stmt.setString(1, String.valueOf(id));
             ResultSet rs = stmt.executeQuery();
             return rs.next() && rs.getInt(1) > 0;
         }

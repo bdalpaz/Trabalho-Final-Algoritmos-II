@@ -15,7 +15,7 @@ public class Viagem {
     private String status;
     private int motoristaId; // Relacionamento com Motorista
     private int clienteId; // Relacionamento com Cliente
-    // private int produtoId;
+    private int produtoId;
 
     public Viagem(int id, String descricao, String cidadeOrigem, String cidadeDestino, String status, int motoristaId, int clienteId) {
         this.id = id;
@@ -165,6 +165,8 @@ public class Viagem {
     public String getStatus() {
         return status;
     }
+
+    public void setStatus(String status) {this.status = status;}
 
     public int getMotoristaId() {
         return motoristaId;

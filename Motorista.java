@@ -49,12 +49,12 @@ public class Motorista {
         return segundoDigitoVerificador == Character.getNumericValue(cpf.charAt(10));
     }
     
-    public boolean validaDadosDoMotorista() {
+    public boolean validaDadosDoMotorista(String cpf) {
         if (nome == null || nome.trim().isEmpty()) {
             System.out.println("Nome não pode estar vazio.");
             return false;
         }
-        if (!validaCpfDoMotorista()) {
+        if (!validaCpfDoMotorista(cpf)) {
             System.out.println("CPF inválido!");
             return false;
         }
@@ -86,7 +86,7 @@ public class Motorista {
     }
 
     public void salvarMotoristaNoBanco() throws SQLException {
-        if (!validaDadosDoMotorista()) return;
+        if (!validaDadosDoMotorista(cpf)) return;
 
         String sql = "INSERT INTO motorista (nome, cpf, cnh, cidade) VALUES (?, ?, ?, ?)";
         try (Connection conn = PostgresConnection.getConnection();
@@ -132,14 +132,14 @@ public class Motorista {
         String sql = "SELECT COUNT(*) FROM viagem WHERE motorista_id = ? and status = 'Iniciada'";
         try (Connection conn = PostgresConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, id);
+            stmt.setString(1, String.valueOf(id));
             ResultSet rs = stmt.executeQuery();
             return rs.next() && rs.getInt(1) > 0;
         }
     }
 
     public void atualizarMotoristaNoBanco() throws SQLException {
-        if (!validaDadosDoMotorista()) return;
+        if (!validaDadosDoMotorista(cpf)) return;
 
         String sql = "UPDATE motorista SET nome = ?, cpf = ?, cnh = ?, cidade = ? WHERE id = ?";
         try (Connection conn = PostgresConnection.getConnection();
