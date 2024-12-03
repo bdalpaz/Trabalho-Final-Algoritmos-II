@@ -230,12 +230,13 @@ public class Main {
         System.out.println("Deseja buscar por (1) ID ou (2) Nome?");
         int escolha = scanner.nextInt();
         scanner.nextLine();
-
+    
         int id = -1;
-
+    
         if (escolha == 1) {
             System.out.print("Digite o ID do " + entidade.toLowerCase() + " a ser excluído: ");
             id = scanner.nextInt();
+            scanner.nextLine();
         } else if (escolha == 2) {
             System.out.print("Digite o Nome do " + entidade.toLowerCase() + " a ser excluído: ");
             String nome = scanner.nextLine();
@@ -248,39 +249,39 @@ public class Main {
             System.out.println("Opção inválida!");
             return;
         }
+    
 
-        switch (entidade) {
-            case "Cliente":
-                boolean temCliente = Cliente.clienteTemViagemAndamento(id);
-                if (temCliente) {
-                    System.out.println(
-                            "Este " + entidade + " não pode ser removido, pois ele está em uma viagem em andamento.");
-                    return;
-                }
-                new Cliente(id, null, null, null).excluirClienteDoBanco();
-                break;
-            case "Motorista":
-                boolean estaEmViagem = Motorista.motoristaTemViagemAndamento(id);
-                if (estaEmViagem) {
-                    System.out.println(
-                            "Este " + entidade + " não pode ser removido, pois ele está em uma viagem em andamento.");
-                    return;
-                }
-                new Motorista(id, null, null, null, null).excluirMotoristaDoBanco();
-                break;
-            case "Produto":
-                boolean produtoEstaEmViagem = Produto.produtoTemViagemAndamento(id);
-                if (produtoEstaEmViagem) {
-                    System.out.println("Este " + entidade + " não pode ser removido, pois ele está em uma viagem em andamento.");
-                    return;
-                }
-                new Produto(id, null, 0).excluirProdutoDoBanco();
-                break;
-            default:
-                throw new IllegalArgumentException("Entidade inválida: " + entidade);
+        boolean podeExcluir = switch (entidade) {
+            case "Cliente" -> !Cliente.clienteTemViagemAndamento(id);
+            case "Motorista" -> !Motorista.motoristaTemViagemAndamento(id);
+            case "Produto" -> !Produto.produtoTemViagemAndamento(id);
+            default -> throw new IllegalArgumentException("Entidade inválida: " + entidade);
+        };
+    
+        if (!podeExcluir) {
+            System.out.println("Este " + entidade + " não pode ser removido, pois está associado(a) a uma viagem em andamento.");
+            return;
         }
+    
+        // validação do usuário
+        System.out.print("Tem certeza de que deseja excluir o " + entidade.toLowerCase() + " com ID " + id + "? (S/N): ");
+        String confirmacao = scanner.nextLine().trim().toUpperCase();
+    
+        if (!confirmacao.equals("S")) {
+            System.out.println(entidade + " não foi excluído(a).");
+            return;
+        }
+    
+        switch (entidade) {
+            case "Cliente" -> new Cliente(id, null, null, null).excluirClienteDoBanco();
+            case "Motorista" -> new Motorista(id, null, null, null, null).excluirMotoristaDoBanco();
+            case "Produto" -> new Produto(id, null, 0).excluirProdutoDoBanco();
+            default -> throw new IllegalArgumentException("Entidade inválida: " + entidade);
+        }
+    
+        System.out.println(entidade + " excluído(a) com sucesso.");
     }
-
+    
     private static int buscarIdPorNome(String nome, String entidade) throws SQLException {
         if (nome == null || nome.isBlank()) {
             System.out.println("Nome não pode ser vazio ou nulo.");
