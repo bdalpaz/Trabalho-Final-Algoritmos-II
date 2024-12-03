@@ -48,7 +48,7 @@ public class Produto {
         if (!validaDadosDoProduto())
             return;
 
-        String sql = "INSERT INTO produto (id, nome, quantidade) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO produto (nome, quantidade) VALUES (?, ?)";
         try (Connection conn = PostgresConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
