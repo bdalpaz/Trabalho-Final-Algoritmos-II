@@ -399,6 +399,7 @@ public class Main {
                                     viagem.getDescricao(), viagem.getCidadeOrigem(), viagem.getCidadeDestino(), viagem.getMotoristaId(), viagem.getClienteId());
                             System.out.println("Iniciando nova viagem...");
                             iniciarViagem(scanner);
+                        return;
                         }
                     }
                     case 2 -> {
@@ -408,6 +409,7 @@ public class Main {
                                     viagem.getDescricao(), viagem.getCidadeOrigem(), viagem.getCidadeDestino(), viagem.getMotoristaId(), viagem.getClienteId());
                             System.out.println("Finalizando viagem...");
                             finalizarViagem(scanner);
+                            return;
                         }
                     }
                     case 3 -> continuar = false;
