@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class Main {
 
 
-       // Conexão com o banco 
+    // Conexão com o banco
     public static class PostgresConnection {
         private static final String URL = "jdbc:postgresql://localhost:5432/postgres";
         private static final String USER = "postgres";
@@ -25,7 +25,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         boolean continuar = true;
-    
+
         while (continuar) {
             System.out.println("\n=== Sistema de Gerenciamento ===");
             System.out.println("1. Gerenciar Clientes");
@@ -34,11 +34,11 @@ public class Main {
             System.out.println("4. Gerenciar Viagens");
             System.out.println("5. Sair");
             System.out.print("Escolha uma opção: ");
-    
+
             try {
                 String input = scanner.nextLine();
                 int op = Integer.parseInt(input);
-    
+
                 switch (op) {
                     case 1 -> menuEntidade(scanner, "Cliente");
                     case 2 -> menuEntidade(scanner, "Motorista");
@@ -230,9 +230,9 @@ public class Main {
         System.out.println("Deseja buscar por (1) ID ou (2) Nome?");
         int escolha = scanner.nextInt();
         scanner.nextLine();
-    
+
         int id = -1;
-    
+
         if (escolha == 1) {
             System.out.print("Digite o ID do " + entidade.toLowerCase() + " a ser excluído: ");
             id = scanner.nextInt();
@@ -249,7 +249,7 @@ public class Main {
             System.out.println("Opção inválida!");
             return;
         }
-    
+
 
         boolean podeExcluir = switch (entidade) {
             case "Cliente" -> !Cliente.clienteTemViagemAndamento(id);
@@ -257,31 +257,31 @@ public class Main {
             case "Produto" -> !Produto.produtoTemViagemAndamento(id);
             default -> throw new IllegalArgumentException("Entidade inválida: " + entidade);
         };
-    
+
         if (!podeExcluir) {
             System.out.println("Este " + entidade + " não pode ser removido, pois está associado(a) a uma viagem em andamento.");
             return;
         }
-    
+
         // validação do usuário
         System.out.print("Tem certeza de que deseja excluir o " + entidade.toLowerCase() + " com ID " + id + "? (S/N): ");
         String confirmacao = scanner.nextLine().trim().toUpperCase();
-    
+
         if (!confirmacao.equals("S")) {
             System.out.println(entidade + " não foi excluído(a).");
             return;
         }
-    
+
         switch (entidade) {
             case "Cliente" -> new Cliente(id, null, null, null).excluirClienteDoBanco();
             case "Motorista" -> new Motorista(id, null, null, null, null).excluirMotoristaDoBanco();
             case "Produto" -> new Produto(id, null, 0).excluirProdutoDoBanco();
             default -> throw new IllegalArgumentException("Entidade inválida: " + entidade);
         }
-    
+
         System.out.println(entidade + " excluído(a) com sucesso.");
     }
-    
+
     private static int buscarIdPorNome(String nome, String entidade) throws SQLException {
         if (nome == null || nome.isBlank()) {
             System.out.println("Nome não pode ser vazio ou nulo.");
@@ -393,26 +393,34 @@ public class Main {
                 System.out.println(opcao);
                 switch (opcao) {
                     case 1 -> {
-                        System.out.println("Iniciando nova viagem...");
-                        iniciarViagem(scanner);
+                        List<Viagem> viagens = Viagem.listarViagens();
+                        for (Viagem viagem : viagens) {
+                            System.out.printf("Descrição: %s, Cidade de Origem: %s, Cidade de Destino: %s, ID do Motorista: %d, Id do Cliente: %d%n",
+                                    viagem.getDescricao(), viagem.getCidadeOrigem(), viagem.getCidadeDestino(), viagem.getMotoristaId(), viagem.getClienteId());
+                            System.out.println("Iniciando nova viagem...");
+                            iniciarViagem(scanner);
+                        }
                     }
                     case 2 -> {
-                        System.out.println("Finalizando viagem...");
-                        finalizarViagem(scanner);
+                        List<Viagem> viagens = Viagem.listarViagens();
+                        for (Viagem viagem : viagens) {
+                            System.out.printf("Descrição: %s, Cidade de Origem: %s, Cidade de Destino: %s, ID do Motorista: %d, Id do Cliente: %d%n",
+                                    viagem.getDescricao(), viagem.getCidadeOrigem(), viagem.getCidadeDestino(), viagem.getMotoristaId(), viagem.getClienteId());
+                            System.out.println("Finalizando viagem...");
+                            finalizarViagem(scanner);
+                        }
                     }
                     case 3 -> continuar = false;
                     default -> System.out.println("Opção inválida! Tente novamente.");
                 }
             } catch (SQLException e) {
                 System.err.println("Erro ao processar viagem: " + e.getMessage());
-                e.printStackTrace(); // Adicionado para identificar problemas de SQL.
+                e.printStackTrace();
             } catch (Exception e) {
                 System.err.println("Erro inesperado: " + e.getMessage());
                 e.printStackTrace();
-                scanner.nextLine(); // Limpar entrada inválida.
+                scanner.nextLine();
             }
         }
     }
 }
-
-
